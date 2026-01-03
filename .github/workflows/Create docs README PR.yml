@@ -1,0 +1,42 @@
+name: Create docs README PR
+
+on:
+  workflow_dispatch:            # run manually from Actions UI
+
+jobs:
+  create-readme-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write           # allows pushing commits
+      pull-requests: write      # allows creating PRs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create docs README
+        run: |
+          mkdir -p docs
+          cat > docs/README.md <<'EOF'
+          # OctoAcme Project Management Docs
+          
+          (Paste your README content here — use the prepared README we discussed.)
+          EOF
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/README.md
+          git commit -m "docs: add OctoAcme project management README" || echo "No changes to commit"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "docs: add OctoAcme project management README"
+          branch: docs/add-project-management-readme
+          title: "docs: add OctoAcme project management README"
+          body: |
+            Adds README summarizing OctoAcme project management processes.
+            Refs #3
+          reviewers: damulo
